@@ -1,5 +1,4 @@
 from jupyterhub.auth import Authenticator
-from tornado.escape import url_escape
 from traitlets import Unicode
 import omero.clients
 
@@ -15,15 +14,21 @@ class OmeroAuthenticator(Authenticator):
         """
         https://github.com/jupyterhub/jupyterhub/blob/1.0.0/jupyterhub/auth.py#L317
         """
-        username = url_escape(username, False).replace(
-            '_', '__').replace('%', '_')
+        def escape_nonalpha(c):
+            """
+            Replace non-alphanumeric characters with bytes converted to _hex
+            """
+            if c.isalnum():
+                return c
+            return ''.join('_{:x}'.format(b) for b in c.encode())
+
+        username = ''.join(escape_nonalpha(c) for c in username)
         return username
 
     async def authenticate(self, handler, data):
         """
         https://github.com/jupyterhub/jupyterhub/blob/1.0.0/jupyterhub/auth.py#L474
         """
-        assert self.omero_host
         client = omero.client(self.omero_host)
         try:
             session = client.createSession(data['username'], data['password'])
@@ -49,4 +54,5 @@ class OmeroAuthenticator(Authenticator):
                 'session_id': client.getSessionId(),
             }
         }
+        self.log.debug(user)
         return user
