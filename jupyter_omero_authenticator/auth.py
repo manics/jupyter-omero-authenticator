@@ -56,3 +56,33 @@ class OmeroAuthenticator(Authenticator):
         }
         self.log.debug(user)
         return user
+
+    async def refresh_user(self, user, handler=None):
+        """
+        https://github.com/jupyterhub/jupyterhub/blob/1.0.0/jupyterhub/auth.py#L429
+
+        If enable_auth_state is disabled we can't refresh since we don't have
+        the session-id to check
+        """
+        if not self.enable_auth_state:
+            self.log.error('auth_state is disabled, not refreshing')
+            return True
+
+        auth_state = await user.get_auth_state()
+        if not all([
+            auth_state.get('session_id'),
+            auth_state.get('omero_host') == self.omero_host,
+        ]):
+            self.log.warning('auth_state does not match')
+            return False
+
+        client = omero.client(self.omero_host)
+        try:
+            session = client.joinSession(auth_state['session_id'])
+            session.detachOnDestroy()
+            client.closeSession()
+            self.log.debug('refreshed user %s', user)
+            return True
+        except Exception as e:
+            self.log.warning(e)
+            return False
