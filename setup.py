@@ -8,6 +8,10 @@ setuptools.setup(
     license='BSD 3-Clause',
     description='Jupyterhub OMERO authenticator',
     packages=setuptools.find_packages(),
+    data_files=[
+        ('share/jupyterhub/templates/omero_authenticator/', [
+            'jupyter_omero_authenticator/templates/omerologin.html']),
+    ],
     install_requires=['jupyterhub'],
     python_requires='>=3.5',
     classifiers=[
