@@ -12,7 +12,10 @@ setuptools.setup(
         ('share/jupyterhub/templates/omero_authenticator/', [
             'jupyter_omero_authenticator/templates/omerologin.html']),
     ],
-    install_requires=['jupyterhub'],
+    install_requires=[
+        'jupyterhub',
+        'omero-py>=5.6.dev9',
+    ],
     python_requires='>=3.5',
     classifiers=[
         'Framework :: Jupyter',
