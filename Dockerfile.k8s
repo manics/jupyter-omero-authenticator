@@ -8,3 +8,4 @@ RUN python3 -mpip install https://github.com/ome/zeroc-ice-ubuntu1804/releases/d
 ADD . /jupyter-omero-authenticator/
 RUN cd /jupyter-omero-authenticator && python3 -mpip install .
 
+USER jovyan
