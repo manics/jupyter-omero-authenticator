@@ -1,8 +1,9 @@
 from jupyterhub.auth import Authenticator
 from jupyterhub.handlers.base import BaseHandler
+from tornado import gen
 from tornado.escape import url_escape
 from tornado.httputil import url_concat
-from traitlets import List, Unicode
+from traitlets import Bool, List, Unicode
 import omero.clients
 from omero.rtypes import unwrap
 
@@ -72,6 +73,11 @@ class OmeroAuthenticator(Authenticator):
         trait=Unicode,
         config=True,
         help='OMERO hostnames or connection URLs')
+
+    export_omero_env = Bool(
+        False,
+        config=True,
+        help='Pass OMERO session environment variables to spawner')
 
     def normalize_username(self, username):
         """
@@ -157,6 +163,19 @@ class OmeroAuthenticator(Authenticator):
         except Exception as e:
             self.log.warning(e)
             return False
+
+    # TODO: Is gen.coroutine needed?
+    @gen.coroutine
+    def pre_spawn_start(self, user, spawner):
+        if self.export_omero_env:
+            auth_state = yield user.get_auth_state()
+            self.log.debug('pre_spawn_start auth_state:%s' % auth_state)
+            if not auth_state:
+                return
+            # setup environment
+            spawner.environment['OMERO_HOST'] = auth_state['omero_host']
+            spawner.environment['OMERO_USER'] = auth_state['omero_user']
+            spawner.environment['OMERO_SESSION'] = auth_state['session_id']
 
     def get_handlers(self, app):
         return [('/login', OmeroLoginHandler, {
