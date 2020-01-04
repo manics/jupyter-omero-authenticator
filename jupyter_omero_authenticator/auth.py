@@ -98,7 +98,9 @@ class OmeroAuthenticator(Authenticator):
         """
         https://github.com/jupyterhub/jupyterhub/blob/1.0.0/jupyterhub/auth.py#L474
         """
-        self.log.debug('data: %s', data)
+        self.log.debug('data: %s', dict(
+            (k, v if k != 'password' else '********')
+            for (k, v) in data.items()))
         server = data['server']
         if server not in self.omero_servers:
             self.log.error('Invalid server: %s', server)
