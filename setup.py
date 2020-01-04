@@ -5,8 +5,10 @@ setuptools.setup(
     version='0.0.1',
     url='https://github.com/manics/jupyter-omero-authenticator',
     author='Simon Li',
-    license='BSD 3-Clause',
+    license='MIT',
     description='Jupyterhub OMERO authenticator',
+    long_description=open('README.md').read(),
+    long_description_content_type='text/markdown',
     packages=setuptools.find_packages(),
     data_files=[
         ('share/jupyterhub/templates/omero_authenticator/', [
@@ -19,6 +21,11 @@ setuptools.setup(
     python_requires='>=3.5',
     classifiers=[
         'Framework :: Jupyter',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3',
+        'Topic :: Scientific/Engineering',
     ],
     zip_safe=False
 )
