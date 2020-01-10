@@ -16,7 +16,7 @@ setuptools.setup(
     ],
     install_requires=[
         'jupyterhub',
-        'omero-py>=5.6.dev9',
+        'omero-py>=5.6.0',
     ],
     python_requires='>=3.5',
     classifiers=[
